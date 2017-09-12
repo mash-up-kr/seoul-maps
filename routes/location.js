@@ -11,7 +11,7 @@ router.post('/insert/toilet', (req, res, next) => {
         let toiletLocation = new ToiletLocation();
 
         toiletLocation.locationName = index.FNAME;
-        toiletLocation.location = [index.X_WGS84, index.Y_WGS84];
+        toiletLocation.location.coordinates = [index.X_WGS84, index.Y_WGS84];
         toiletLocation.toiletType = index.ANAME;
         toiletLocation.insertDate = index.INSERTDATE;
         toiletLocation.updateDate = index.UPDATEDATE;
@@ -32,15 +32,18 @@ router.get('/get/toilet', (req, res, next) => {
 
     console.log(req.query);
 
-    let distance = 1/111.12;
+    let distance = 500;
 
     let query = ToiletLocation.find({
         'location': {
-            $near: [
-                req.query.lng,
-                req.query.lat
-            ],
-            $maxDistance: distance
+            $near:
+                {
+                    $geometry: {
+                        type: "Point",
+                        coordinates: [req.query.lng, req.query.lat]
+                    },
+                    $maxDistance: distance
+                }
         }
     });
 
@@ -54,8 +57,8 @@ router.get('/get/toilet', (req, res, next) => {
             })
         }
 
-        console.log(city.length);
-        if (!city) {
+        console.log(result.length);
+        if (!result) {
             return res.status(200).json({
                 message: "Not Exist Toilet Location",
                 code: 2

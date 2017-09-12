@@ -5,12 +5,19 @@ const ToiletScheme = new Schema({
 
     locationName: String,
     location: {
-        type: [Number],
-        index: '2dSphere'
+        type: {
+            type: String,
+            default: "Point"
+        },
+        coordinates: {
+            type: [Number]
+        }
     },
     toiletType: String,
     insertDate: String,
     updateDate: String
 });
+
+ToiletScheme.index({ "location": "2dsphere" });
 
 module.exports = mongoose.model("toiletLocation", ToiletScheme);
